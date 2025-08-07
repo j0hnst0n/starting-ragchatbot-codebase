@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import os
 
 from config import config
@@ -40,10 +40,15 @@ class QueryRequest(BaseModel):
     query: str
     session_id: Optional[str] = None
 
+class SourceData(BaseModel):
+    """Model for source data with optional lesson link"""
+    display_text: str
+    lesson_link: Optional[str] = None
+
 class QueryResponse(BaseModel):
     """Response model for course queries"""
     answer: str
-    sources: List[str]
+    sources: List[SourceData]
     session_id: str
 
 class CourseStats(BaseModel):
@@ -65,9 +70,25 @@ async def query_documents(request: QueryRequest):
         # Process query using RAG system
         answer, sources = rag_system.query(request.query, session_id)
         
+        # Convert sources to SourceData objects
+        source_data_list = []
+        for source in sources:
+            if isinstance(source, dict):
+                # New structured format
+                source_data_list.append(SourceData(
+                    display_text=source.get('display_text', ''),
+                    lesson_link=source.get('lesson_link')
+                ))
+            else:
+                # Backward compatibility for string sources
+                source_data_list.append(SourceData(
+                    display_text=str(source),
+                    lesson_link=None
+                ))
+        
         return QueryResponse(
             answer=answer,
-            sources=sources,
+            sources=source_data_list,
             session_id=session_id
         )
     except Exception as e:

@@ -21,6 +21,11 @@ class Config:
     MAX_RESULTS: int = 5         # Maximum search results to return
     MAX_HISTORY: int = 2         # Number of conversation messages to remember
     
+    # Sequential tool calling settings
+    MAX_TOOL_ROUNDS: int = 2     # Maximum sequential tool calling rounds
+    TOOL_EXECUTION_TIMEOUT: int = 30  # Tool execution timeout in seconds
+    MAX_API_RETRIES: int = 2     # Maximum API retry attempts
+    
     # Database paths
     CHROMA_PATH: str = "./chroma_db"  # ChromaDB storage location
 
