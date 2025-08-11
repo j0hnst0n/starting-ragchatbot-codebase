@@ -16,16 +16,27 @@ cd backend && uv run uvicorn app:app --reload --port 8000
 
 **Install dependencies:**
 ```bash
-uv sync
+uv sync --group dev  # Includes development tools
 ```
 
 **Environment setup:**
 Create `.env` file with `ANTHROPIC_API_KEY=your_key_here`
 
+**Code Quality Tools:**
+```bash
+make quality      # Run all quality checks (format, lint, test)
+make format       # Format code with black and isort
+make lint         # Run linting tools (flake8, mypy)  
+make test         # Run all tests
+make install      # Install all dependencies
+```
+
 ## Project Guidelines
 
 - Always use uv to run the server, do not use pip directly
 - Make sure to use uv to manage all dependencies
+- Run `make quality` before committing code to ensure formatting and linting standards
+- Use `make format` to automatically format code with Black and organize imports with isort
 
 ## Architecture Overview
 
@@ -112,3 +123,26 @@ Key settings in `config.py`:
 **Error Handling:** Graceful degradation - if vector search fails, AI falls back to general knowledge. Frontend shows loading states and error messages.
 
 **Tool Execution:** AI can execute one search per query maximum. Tool results are synthesized into natural responses without meta-commentary about the search process.
+
+### Code Quality Tools
+
+**Formatting and Linting:**
+- **Black**: Automatic code formatting with 88-character line length
+- **isort**: Import statement organization and sorting
+- **flake8**: Style and syntax checking
+- **mypy**: Static type checking for better code reliability
+
+**Development Scripts (`scripts/`):**
+- `format.py`: Runs Black and isort for code formatting
+- `lint.py`: Runs flake8 and mypy for quality checks
+- `test.py`: Executes pytest test suite
+- `quality.py`: Runs all quality tools in sequence
+
+**Configuration:**
+- All tool configurations are in `pyproject.toml`
+- Black configured for 88-character lines, Python 3.13 compatibility
+- isort configured to work with Black formatting
+- mypy configured with strict type checking options
+
+**Usage:**
+Use `make quality` before commits to ensure code meets project standards. The Makefile provides convenient shortcuts for all development tasks.
